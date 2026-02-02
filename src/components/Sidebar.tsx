@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, MessageSquare, Filter, Tag, X } from 'lucide-react';
+import { Search, Plus, Filter, Tag, X } from 'lucide-react';
 import type { Chat, Tag as TagType } from '../types';
 import { getTags, addTagToChat, removeTagFromChat, supabase } from '../lib/supabase';
 
