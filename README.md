@@ -273,13 +273,13 @@ flowchart TB
 ## 📸 Output Screenshots
 
 ### Output 1
-![Output 1](output1.png)
+![Output 1](Output\W output1.png)
 
 ### Output 2
-![Output 2](output2.png)
+![Output 2](Output\W output2.png)
 
 ### Output 3
-![Output 3](output3.png)
+![Output 3](Output\W output3.png)
 
 ---
 
