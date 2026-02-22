@@ -309,14 +309,9 @@ flowchart TB
    
    Create a `.env.local` file in the root directory:
    ```env
-   # OpenRouter API Key (required)
-   # Get yours at: https://openrouter.ai/keys
-   VITE_OPENROUTER_API_KEY=your_openrouter_api_key_here
-
-   # Supabase Configuration (required for persistence)
-   # Get from: https://supabase.com/dashboard/project/_/settings/api
-   VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+   # Model API Key (required)
+   # 
+   #cloud database api and url:
    ```
 
 4. **Set up Supabase Database**
