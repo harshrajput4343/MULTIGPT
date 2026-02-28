@@ -497,7 +497,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Built By @heymyselfharsh@gmail.com**
+**Built By Harsh Kumar  || @heymyselfharsh@gmail.com**
 
 [Report Bug](issues) · [Request Feature](issues)
 
