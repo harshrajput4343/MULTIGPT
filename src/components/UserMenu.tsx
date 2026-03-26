@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import { Settings, HelpCircle, LogOut, Sparkles, Palette, ChevronRight } from 'lucide-react';
 
+import { AvatarPicker, AVATARS } from './AvatarPicker';
+
 interface UserMenuProps {
   user: any;
+  userAvatar: number;
   onLogout: () => void;
   onLoginClick: () => void;
+  onAvatarChange: (id: number) => void;
 }
 
-export function UserMenu({ user, onLogout, onLoginClick }: UserMenuProps) {
+export function UserMenu({ user, userAvatar, onLogout, onLoginClick, onAvatarChange }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   if (!user) {
     return (
@@ -40,9 +45,20 @@ export function UserMenu({ user, onLogout, onLoginClick }: UserMenuProps) {
   const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
   const userEmail = user.email || '';
   const initials = userName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+  const selectedAvatar = AVATARS.find(a => a.id === userAvatar);
 
   return (
     <div style={{ position: 'relative' }}>
+      <AvatarPicker
+        isOpen={showAvatarPicker}
+        onClose={() => setShowAvatarPicker(false)}
+        currentAvatarId={userAvatar}
+        onSelect={(id) => {
+          onAvatarChange(id);
+          setShowAvatarPicker(false);
+          setIsOpen(false);
+        }}
+      />
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
@@ -63,15 +79,15 @@ export function UserMenu({ user, onLogout, onLoginClick }: UserMenuProps) {
           width: 28,
           height: 28,
           borderRadius: '50%',
-          background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
+          background: selectedAvatar ? selectedAvatar.color : 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '0.75rem',
+          fontSize: selectedAvatar ? '1rem' : '0.75rem',
           fontWeight: '600',
           color: 'white'
         }}>
-          {initials}
+          {selectedAvatar ? selectedAvatar.emoji : initials}
         </div>
         {userName}
       </button>
@@ -113,15 +129,15 @@ export function UserMenu({ user, onLogout, onLoginClick }: UserMenuProps) {
                 width: 40,
                 height: 40,
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
+                background: selectedAvatar ? selectedAvatar.color : 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1rem',
+                fontSize: selectedAvatar ? '1.5rem' : '1rem',
                 fontWeight: '600',
                 color: 'white'
               }}>
-                {initials}
+                {selectedAvatar ? selectedAvatar.emoji : initials}
               </div>
               <div>
                 <div style={{ fontWeight: '600', color: 'white' }}>{userName}</div>
@@ -132,7 +148,14 @@ export function UserMenu({ user, onLogout, onLoginClick }: UserMenuProps) {
             {/* Menu Items */}
             <div style={{ padding: '0.5rem' }}>
               <MenuItem icon={<Sparkles size={18} />} label="Upgrade plan" />
-              <MenuItem icon={<Palette size={18} />} label="Personalization" />
+              <MenuItem 
+                icon={<Palette size={18} />} 
+                label="Personalization" 
+                onClick={() => {
+                  setShowAvatarPicker(true);
+                  setIsOpen(false);
+                }}
+              />
               <MenuItem icon={<Settings size={18} />} label="Settings" />
               <MenuItem icon={<HelpCircle size={18} />} label="Help" hasArrow />
             </div>
@@ -183,15 +206,15 @@ export function UserMenu({ user, onLogout, onLoginClick }: UserMenuProps) {
                 width: 32,
                 height: 32,
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
+                background: selectedAvatar ? selectedAvatar.color : 'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '0.75rem',
+                fontSize: selectedAvatar ? '1.25rem' : '0.75rem',
                 fontWeight: '600',
                 color: 'white'
               }}>
-                {initials}
+                {selectedAvatar ? selectedAvatar.emoji : initials}
               </div>
               <div>
                 <div style={{ fontWeight: '500', color: 'white', fontSize: '0.85rem' }}>{userName}</div>
@@ -205,9 +228,10 @@ export function UserMenu({ user, onLogout, onLoginClick }: UserMenuProps) {
   );
 }
 
-function MenuItem({ icon, label, hasArrow }: { icon: React.ReactNode; label: string; hasArrow?: boolean }) {
+function MenuItem({ icon, label, hasArrow, onClick }: { icon: React.ReactNode; label: string; hasArrow?: boolean; onClick?: () => void }) {
   return (
     <button
+      onClick={onClick}
       style={{
         width: '100%',
         display: 'flex',

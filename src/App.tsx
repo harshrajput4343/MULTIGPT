@@ -4,12 +4,13 @@ import { ModelTabs } from './components/ModelTabs';
 import { MarkdownRenderer } from './components/MarkdownRenderer';
 import { UserMenu } from './components/UserMenu';
 import { LoginModal } from './components/LoginModal';
+import { ShareModal } from './components/ShareModal';
 import type { Message, Chat } from './types';
 import { MODELS } from './types';
 import { createChatCompletion } from './lib/openrouter';
-import { getChats, createChat, getMessages, saveMessage, updateChatTitle, shareChat, getSharedChatMessages, getCurrentUser, signOut, onAuthStateChange } from './lib/supabase';
+import { getChats, createChat, getMessages, saveMessage, updateChatTitle, shareChat, getSharedChatMessages, getCurrentUser, signOut, onAuthStateChange, saveMemory, getMemories, getUserProfile, updateAvatar } from './lib/supabase';
 import { routeQuery } from './lib/router';
-import { Share2, Check, Copy, ThumbsUp, ThumbsDown, RefreshCw, MoreHorizontal } from 'lucide-react';
+import { Share2, Check, Copy, ThumbsUp, ThumbsDown, RefreshCw, MoreHorizontal, Mic } from 'lucide-react';
 
 function App() {
   const [activeModelId, setActiveModelId] = useState('auto');
@@ -20,18 +21,90 @@ function App() {
   const [activeChatId, setActiveChatId] = useState<string | undefined>();
   const [routingInfo, setRoutingInfo] = useState<{ model: string; reason: string } | null>(null);
   const [isSharedView, setIsSharedView] = useState(false);
-  const [shareCopied, setShareCopied] = useState(false);
   const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Record<string, 'good' | 'bad' | null>>({});
   const [user, setUser] = useState<any>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [userAvatar, setUserAvatar] = useState<number>(0);
+  const [isRecording, setIsRecording] = useState(false);
+
+  // Voice recording
+  const toggleRecording = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser doesn't support speech recognition. Try Chrome or Edge.");
+      return;
+    }
+
+    if (isRecording) {
+      setIsRecording(false);
+      // It will auto-stop, or we could keep a ref to the recognition instance to call .stop()
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      setIsRecording(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      let currentTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        currentTranscript += event.results[i][0].transcript;
+      }
+      if (event.results[0].isFinal) {
+        setInput((prev) => prev + (prev.length > 0 && !prev.endsWith(' ') ? ' ' : '') + currentTranscript);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error', event.error);
+      setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognition.start();
+  };
+
+  // Memory detection patterns
+  const detectMemory = (text: string): { key: string; value: string } | null => {
+    const patterns = [
+      /remember (?:that )?my (\w[\w\s]*?) is ([\w\s@.]+)/i,
+      /my (\w[\w\s]*?) is ([\w\s@.]+?)(?:\.|,|!|$)/i,
+      /i am ([\w\s]+)/i,
+      /call me ([\w\s]+)/i,
+    ];
+    for (const pattern of patterns) {
+      const match = text.match(pattern);
+      if (match) {
+        if (pattern === patterns[2]) return { key: 'identity', value: match[1].trim() };
+        if (pattern === patterns[3]) return { key: 'name', value: match[1].trim() };
+        return { key: match[1].trim().toLowerCase(), value: match[2].trim() };
+      }
+    }
+    // Explicit "remember" keyword catch-all
+    const rememberMatch = text.match(/remember[:\s]+(.+)/i);
+    if (rememberMatch) return { key: 'note', value: rememberMatch[1].trim() };
+    return null;
+  };
 
   // Check for auth state on mount
   useEffect(() => {
     getCurrentUser().then(setUser);
     const { data } = onAuthStateChange((user) => {
       setUser(user);
-      if (user) loadChats();
+      if (user) {
+        loadChats();
+        getUserProfile().then(p => { if (p) setUserAvatar(p.avatar_id); });
+      }
     });
     return () => data?.subscription?.unsubscribe();
   }, []);
@@ -153,6 +226,20 @@ function App() {
     });
 
     try {
+      // Detect and save memory
+      const memory = detectMemory(input);
+      if (memory) {
+        await saveMemory(memory.key, memory.value);
+      }
+
+      // Fetch user memories for context
+      const memories = await getMemories();
+      let systemPrompt = '';
+      if (memories.length > 0) {
+        const memoryStr = memories.map(m => `${m.key}: ${m.value}`).join(', ');
+        systemPrompt = `User facts you must remember and use: ${memoryStr}. Always use these facts when relevant to the conversation.`;
+      }
+
       // Smart Model Routing for Auto-Select
       let modelToUse = activeModelId;
       if (activeModelId === 'auto') {
@@ -178,8 +265,13 @@ function App() {
       setMessages((prev) => [...prev, assistantMessage]);
 
       try {
+        const contextMessages = [...messages, userMessage].map(({ role, content }) => ({ role, content }));
+        // Prepend system message with memories
+        if (systemPrompt) {
+          contextMessages.unshift({ role: 'system', content: systemPrompt });
+        }
         await createChatCompletion(
-          [...messages, userMessage].map(({ role, content }) => ({ role, content })),
+          contextMessages,
           { model: modelToUse },
           (chunk) => {
             assistantContent += chunk;
@@ -232,34 +324,27 @@ function App() {
         <div className="user-profile" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {activeChatId && !isSharedView && (
             <button
-              onClick={async () => {
-                const shareId = await shareChat(activeChatId);
-                if (shareId) {
-                  const link = `${window.location.origin}?share=${shareId}`;
-                  await navigator.clipboard.writeText(link);
-                  setShareCopied(true);
-                  setTimeout(() => setShareCopied(false), 3000);
-                }
-              }}
+              onClick={() => setShowShareModal(true)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '0.5rem',
-                background: shareCopied ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
+                background: 'transparent',
                 border: 'none',
                 borderRadius: '0.5rem',
-                color: shareCopied ? '#22c55e' : 'var(--text-muted)',
+                color: 'var(--text-muted)',
                 cursor: 'pointer',
                 transition: 'all 0.2s'
               }}
-              title={shareCopied ? 'Link copied!' : 'Share chat'}
+              title="Share chat"
             >
-              {shareCopied ? <Check size={18} /> : <Share2 size={18} />}
+              <Share2 size={18} />
             </button>
           )}
           <UserMenu
             user={user}
+            userAvatar={userAvatar}
             onLogout={async () => {
               await signOut();
               setUser(null);
@@ -268,6 +353,10 @@ function App() {
               setActiveChatId(undefined);
             }}
             onLoginClick={() => setShowLoginModal(true)}
+            onAvatarChange={async (id) => {
+              setUserAvatar(id);
+              if (user) await updateAvatar(id);
+            }}
           />
         </div>
       </header>
@@ -278,6 +367,17 @@ function App() {
         onSuccess={() => {
           getCurrentUser().then(setUser);
           loadChats();
+        }}
+      />
+
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        chatTitle={chats.find(c => c.id === activeChatId)?.title || 'Untitled Chat'}
+        shareId={null}
+        onGenerateLink={async () => {
+          if (!activeChatId) return null;
+          return await shareChat(activeChatId);
         }}
       />
 
@@ -487,6 +587,24 @@ function App() {
                   height: '50px'
                 }}
               />
+              <button
+                onClick={toggleRecording}
+                style={{
+                  border: 'none',
+                  color: isRecording ? '#ef4444' : 'var(--text-muted)',
+                  padding: '0.6rem',
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  marginRight: '0.5rem',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.2s',
+                  animation: isRecording ? 'pulse 1.5s infinite' : 'none',
+                  background: isRecording ? 'rgba(239, 68, 68, 0.1)' : 'transparent'
+                }}
+                title={isRecording ? 'Stop recording' : 'Voice input'}
+              >
+                <Mic size={20} />
+              </button>
               <button
                 onClick={handleSend}
                 disabled={isLoading || !input.trim()}

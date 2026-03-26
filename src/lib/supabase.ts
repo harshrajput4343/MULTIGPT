@@ -252,6 +252,34 @@ export async function getTags() {
   return data || [];
 }
 
+export async function createTag(name: string, color: string) {
+  if (!supabase) return null;
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from('tags')
+    .insert({ name: name.trim(), color })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating tag:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function deleteTag(tagId: string) {
+  if (!supabase) return;
+  const user = await getCurrentUser();
+  if (!user) return;
+
+  // Delete from chat_tags first (cascade should handle, but be safe)
+  await supabase.from('chat_tags').delete().eq('tag_id', tagId);
+  await supabase.from('tags').delete().eq('id', tagId);
+}
+
 export async function addTagToChat(chatId: string, tagId: string) {
   if (!supabase) return;
   const user = await getCurrentUser();
@@ -290,4 +318,118 @@ export async function searchChats(query: string) {
     return [];
   }
   return data || [];
+}
+
+// ========== MEMORIES ==========
+
+export async function saveMemory(key: string, value: string) {
+  if (!supabase) return null;
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  // Upsert: if same key exists, update the value
+  const { data: existing } = await supabase
+    .from('memories')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('key', key)
+    .single();
+
+  if (existing) {
+    const { data, error } = await supabase
+      .from('memories')
+      .update({ value })
+      .eq('id', existing.id)
+      .select()
+      .single();
+    if (error) console.error('Error updating memory:', error);
+    return data;
+  }
+
+  const { data, error } = await supabase
+    .from('memories')
+    .insert({ user_id: user.id, key, value })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error saving memory:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function getMemories() {
+  if (!supabase) return [];
+  const user = await getCurrentUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from('memories')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching memories:', error);
+    return [];
+  }
+  return data || [];
+}
+
+export async function deleteMemory(memoryId: string) {
+  if (!supabase) return;
+  const user = await getCurrentUser();
+  if (!user) return;
+
+  await supabase.from('memories').delete().eq('id', memoryId).eq('user_id', user.id);
+}
+
+// ========== USER PROFILES (Avatars) ==========
+
+export async function getUserProfile() {
+  if (!supabase) return null;
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+
+  if (error && error.code !== 'PGRST116') {
+    console.error('Error fetching profile:', error);
+  }
+  return data;
+}
+
+export async function updateAvatar(avatarId: number) {
+  if (!supabase) return null;
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  // Upsert profile
+  const existing = await getUserProfile();
+  if (existing) {
+    const { data } = await supabase
+      .from('user_profiles')
+      .update({ avatar_id: avatarId })
+      .eq('user_id', user.id)
+      .select()
+      .single();
+    return data;
+  }
+
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .insert({ user_id: user.id, avatar_id: avatarId })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating avatar:', error);
+    return null;
+  }
+  return data;
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Filter, Tag, X } from 'lucide-react';
 import type { Chat, Tag as TagType } from '../types';
-import { getTags, addTagToChat, removeTagFromChat, supabase } from '../lib/supabase';
+import { getTags, addTagToChat, removeTagFromChat, createTag, deleteTag } from '../lib/supabase';
 
 interface SidebarProps {
   chats: Chat[];
@@ -61,14 +61,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const createNewTag = async () => {
-    if (!newTagName.trim() || !supabase) return;
+    if (!newTagName.trim()) return;
     const colors = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    const newTag = await createTag(newTagName.trim(), randomColor);
+    if (newTag) {
+      setNewTagName('');
+      setShowCreateTag(false);
+      loadTags();
+    }
+  };
 
-    await supabase.from('tags').insert({ name: newTagName.trim(), color: randomColor });
-    setNewTagName('');
-    setShowCreateTag(false);
+  const handleDeleteTag = async (tagId: string) => {
+    await deleteTag(tagId);
+    setSelectedTagIds(prev => prev.filter(id => id !== tagId));
     loadTags();
+    if (onChatsUpdate) onChatsUpdate();
   };
 
   const filteredChats = chats.filter(chat => {
@@ -172,11 +180,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {showTagFilter && (
           <div style={{ marginTop: '0.75rem', display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
             {allTags.map(tag => (
-              <button
+              <div
                 key={tag.id}
-                onClick={() => toggleTag(tag.id)}
                 style={{
-                  padding: '0.2rem 0.5rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.15rem',
+                  padding: '0.15rem 0.4rem',
                   borderRadius: '4px',
                   fontSize: '0.7rem',
                   background: selectedTagIds.includes(tag.id) ? tag.color + '30' : 'rgba(255,255,255,0.05)',
@@ -186,13 +196,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   transition: 'all 0.2s'
                 }}
               >
-                {tag.name}
-              </button>
+                <span onClick={() => toggleTag(tag.id)}>{tag.name}</span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleDeleteTag(tag.id); }}
+                  style={{
+                    background: 'transparent', border: 'none', cursor: 'pointer',
+                    padding: '0 0.1rem', display: 'flex', alignItems: 'center',
+                    color: 'inherit', opacity: 0.6
+                  }}
+                  title={`Delete tag "${tag.name}"`}
+                >
+                  <X size={10} />
+                </button>
+              </div>
             ))}
             <button
               onClick={() => setShowCreateTag(true)}
               style={{
-                padding: '0.2rem 0.5rem',
+                padding: '0.15rem 0.4rem',
                 borderRadius: '4px',
                 fontSize: '0.7rem',
                 background: 'rgba(255,255,255,0.05)',
@@ -330,6 +351,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       );
                     })
                   )}
+                  {/* Inline create tag */}
+                  <div style={{ marginTop: '0.5rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '0.25rem' }}>
+                      <input
+                        type="text"
+                        placeholder="New tag..."
+                        value={newTagName}
+                        onChange={(e) => setNewTagName(e.target.value)}
+                        onKeyDown={(e) => {
+                          e.stopPropagation();
+                          if (e.key === 'Enter') {
+                            createNewTag().then(() => loadTags());
+                          }
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          flex: 1, padding: '0.25rem 0.4rem', fontSize: '0.7rem',
+                          background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)',
+                          borderRadius: '3px', color: 'white', outline: 'none',
+                          minWidth: 0
+                        }}
+                      />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); createNewTag().then(() => loadTags()); }}
+                        style={{
+                          padding: '0.25rem 0.4rem', fontSize: '0.65rem',
+                          background: 'var(--primary)', border: 'none', borderRadius: '3px',
+                          color: 'white', cursor: 'pointer', whiteSpace: 'nowrap'
+                        }}
+                      >+</button>
+                    </div>
+                  </div>
                 </div>
               )}
 
