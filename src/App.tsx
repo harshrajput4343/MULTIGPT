@@ -78,6 +78,10 @@ function App() {
   };
 
   const handleNewChat = async () => {
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
     const newChat = await createChat('New Chat');
     if (newChat) {
       setChats(prev => [newChat as Chat, ...prev]);
@@ -98,6 +102,10 @@ function App() {
   };
 
   const handleSend = async () => {
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
     if (!input.trim() || isLoading) return;
 
     // Create new chat if none exists
@@ -217,6 +225,7 @@ function App() {
       activeChatId={activeChatId}
       onChatSelect={handleChatSelect}
       onNewChat={handleNewChat}
+      onChatsUpdate={loadChats}
     >
       <header className="chat-header">
         <ModelTabs activeModelId={activeModelId} onModelChange={setActiveModelId} />
@@ -453,45 +462,71 @@ function App() {
       </div>
 
       <div className="chat-input-container">
-        <div className="input-wrapper glass" style={{ padding: '0.5rem', borderRadius: '1rem', display: 'flex', alignItems: 'center' }}>
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-            placeholder="Type your message..."
-            style={{
-              flex: 1,
-              background: 'transparent',
-              border: 'none',
-              color: 'white',
-              padding: '0.8rem',
-              resize: 'none',
-              outline: 'none',
-              fontSize: '1rem',
-              height: '50px'
-            }}
-          />
-          <button
-            onClick={handleSend}
-            disabled={isLoading || !input.trim()}
-            style={{
-              background: 'var(--primary)',
-              border: 'none',
-              color: 'white',
-              padding: '0.6rem 1.2rem',
-              borderRadius: '0.6rem',
-              cursor: 'pointer',
-              fontWeight: '600',
-              opacity: isLoading || !input.trim() ? 0.5 : 1
-            }}
-          >
-            {isLoading ? '...' : 'Send'}
-          </button>
+        <div className="input-wrapper glass" style={{ padding: '0.5rem', borderRadius: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {user ? (
+            <>
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder="Type your message..."
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'white',
+                  padding: '0.8rem',
+                  resize: 'none',
+                  outline: 'none',
+                  fontSize: '1rem',
+                  height: '50px'
+                }}
+              />
+              <button
+                onClick={handleSend}
+                disabled={isLoading || !input.trim()}
+                style={{
+                  background: 'var(--primary)',
+                  border: 'none',
+                  color: 'white',
+                  padding: '0.6rem 1.2rem',
+                  borderRadius: '0.6rem',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  opacity: isLoading || !input.trim() ? 0.5 : 1
+                }}
+              >
+                {isLoading ? '...' : 'Send'}
+              </button>
+            </>
+          ) : (
+            <div style={{ padding: '0.8rem', textAlign: 'center', width: '100%' }}>
+              <button
+                onClick={() => setShowLoginModal(true)}
+                style={{
+                  background: 'var(--primary)',
+                  border: 'none',
+                  color: 'white',
+                  padding: '0.6rem 1.5rem',
+                  borderRadius: '0.6rem',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '1rem',
+                  transition: 'background 0.2s',
+                  boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)'
+                }}
+                onMouseOver={(e) => (e.currentTarget.style.background = 'var(--primary-hover)')}
+                onMouseOut={(e) => (e.currentTarget.style.background = 'var(--primary)')}
+              >
+                Sign In to Start Chatting
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </Layout>

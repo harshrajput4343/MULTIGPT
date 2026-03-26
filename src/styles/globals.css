@@ -197,3 +197,78 @@ body {
   opacity: 1;
   transition: opacity 200ms ease-in;
 }
+
+/* Mobile Responsiveness */
+.mobile-menu-btn, .mobile-close-btn {
+  display: none;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    transform: translateX(-100%);
+    width: 85%;
+    max-width: 320px;
+    background-color: var(--bg-darker);
+    border-right: 1px solid var(--border-color);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .chat-header {
+    padding-left: 3.5rem; /* Make room for the mobile menu button */
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0.5rem;
+    z-index: 20;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+  }
+
+  .mobile-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    z-index: 30;
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 5;
+    backdrop-filter: blur(4px);
+  }
+}

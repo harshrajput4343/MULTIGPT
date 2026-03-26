@@ -56,24 +56,38 @@ export function onAuthStateChange(callback: (user: any) => void) {
 
 export async function getChats() {
   if (!supabase) return [];
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   const { data, error } = await supabase
     .from('chats')
     .select('*, chat_tags(tag_id, tags(*))')
+    .eq('user_id', user.id)
     .order('updated_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching chats:', error);
     return [];
   }
-  return data || [];
+  
+  return (data || []).map(chat => ({
+    ...chat,
+    tags: chat.chat_tags ? chat.chat_tags.map((ct: any) => ct.tags).filter(Boolean) : []
+  }));
 }
 
 export async function createChat(title: string = 'New Chat') {
   if (!supabase) return { id: Date.now().toString(), title, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
 
+  const user = await getCurrentUser();
+  if (!user) {
+    console.error('User must be logged in to create a chat');
+    return null;
+  }
+
   const { data, error } = await supabase
     .from('chats')
-    .insert({ title })
+    .insert({ title, user_id: user.id })
     .select()
     .single();
 
@@ -81,11 +95,15 @@ export async function createChat(title: string = 'New Chat') {
     console.error('Error creating chat:', error);
     return null;
   }
-  return data;
+  
+  return { ...data, tags: [] };
 }
 
 export async function updateChatTitle(chatId: string, title: string) {
   if (!supabase) return;
+  const user = await getCurrentUser();
+  if (!user) return;
+  
   await supabase
     .from('chats')
     .update({ title, updated_at: new Date().toISOString() })
@@ -100,6 +118,8 @@ function generateShareId(): string {
 // Share a chat and get the share link
 export async function shareChat(chatId: string): Promise<string | null> {
   if (!supabase) return null;
+  const user = await getCurrentUser();
+  if (!user) return null;
 
   // Check if already shared
   const { data: existing } = await supabase
@@ -169,6 +189,9 @@ export async function getSharedChatMessages(shareId: string) {
 
 export async function getMessages(chatId: string) {
   if (!supabase) return [];
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   const { data, error } = await supabase
     .from('messages')
     .select('*')
@@ -189,6 +212,8 @@ export async function saveMessage(message: {
   model_used: string;
 }) {
   if (!supabase) return message;
+  const user = await getCurrentUser();
+  if (!user) return null;
 
   const { data, error } = await supabase
     .from('messages')
@@ -229,6 +254,9 @@ export async function getTags() {
 
 export async function addTagToChat(chatId: string, tagId: string) {
   if (!supabase) return;
+  const user = await getCurrentUser();
+  if (!user) return;
+  
   await supabase
     .from('chat_tags')
     .insert({ chat_id: chatId, tag_id: tagId });
@@ -236,6 +264,9 @@ export async function addTagToChat(chatId: string, tagId: string) {
 
 export async function removeTagFromChat(chatId: string, tagId: string) {
   if (!supabase) return;
+  const user = await getCurrentUser();
+  if (!user) return;
+
   await supabase
     .from('chat_tags')
     .delete()
@@ -245,6 +276,9 @@ export async function removeTagFromChat(chatId: string, tagId: string) {
 
 export async function searchChats(query: string) {
   if (!supabase) return [];
+  const user = await getCurrentUser();
+  if (!user) return [];
+
   const { data, error } = await supabase
     .from('messages')
     .select('chat_id, content, chats(title)')

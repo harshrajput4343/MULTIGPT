@@ -8,13 +8,19 @@ interface SidebarProps {
   activeChatId?: string;
   onChatSelect: (chatId: string) => void;
   onNewChat: () => void;
+  onChatsUpdate?: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   chats,
   activeChatId,
   onChatSelect,
-  onNewChat
+  onNewChat,
+  onChatsUpdate,
+  isOpen,
+  onClose
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [allTags, setAllTags] = useState<TagType[]>([]);
@@ -47,7 +53,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
     } else {
       await addTagToChat(chatId, tagId);
     }
-    // Refresh would be needed here - for now just close menu
+    // Refresh chats
+    if (onChatsUpdate) {
+      onChatsUpdate();
+    }
     setTagMenuChatId(null);
   };
 
@@ -70,7 +79,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   });
 
   return (
-    <aside className="sidebar glass">
+    <aside className={`sidebar glass ${isOpen ? 'open' : ''}`}>
+      {onClose && (
+        <button className="mobile-close-btn" onClick={onClose}>
+          <X size={20} />
+        </button>
+      )}
       <div style={{ padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', borderBottom: '1px solid var(--border-color)' }}>
         <h2 style={{
           fontSize: '1.75rem',
