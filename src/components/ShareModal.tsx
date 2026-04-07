@@ -60,7 +60,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   };
 
   const socialButtons = [
-    { id: 'copy', label: 'Copy link', emoji: '🔗', color: '#6366f1' },
+    { id: 'copy', label: 'Copy link', emoji: '🔗', color: '#3b82f6' },
     { id: 'x', label: 'X', emoji: '𝕏', color: '#000000' },
     { id: 'linkedin', label: 'LinkedIn', emoji: 'in', color: '#0A66C2' },
     { id: 'reddit', label: 'Reddit', emoji: '🤖', color: '#FF4500' },
@@ -110,8 +110,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({
         <div style={{
           margin: '1rem 1.5rem',
           padding: '0.75rem 1rem',
-          background: 'rgba(99, 102, 241, 0.08)',
-          border: '1px solid rgba(99, 102, 241, 0.2)',
+          background: 'rgba(59, 130, 246, 0.08)',
+          border: '1px solid rgba(59, 130, 246, 0.2)',
           borderRadius: '0.75rem',
           display: 'flex', alignItems: 'flex-start', gap: '0.5rem',
           fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5

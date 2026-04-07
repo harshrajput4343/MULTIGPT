@@ -1,6 +1,6 @@
 :root {
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
   --bg-dark: #0f172a;
   --bg-darker: #020617;
   --text-main: #f8fafc;
@@ -47,6 +47,54 @@ body {
   -webkit-backdrop-filter: var(--glass-blur);
   border: var(--glass-border);
   box-shadow: var(--glass-shadow);
+}
+
+/* Liquid Glass Buttons */
+.liquid-btn {
+  background: rgba(59, 130, 246, 0.25) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.liquid-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  animation: shine 4s infinite;
+  z-index: -1;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  15% { left: 200%; }
+  100% { left: 200%; }
+}
+
+.liquid-btn:hover {
+  background: rgba(59, 130, 246, 0.5) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+}
+
+.liquid-btn:active {
+  transform: translateY(0);
 }
 
 .sidebar {
@@ -180,7 +228,7 @@ body {
 .tab.active {
   background: var(--primary);
   color: white;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
 .tab:not(.active):hover {
@@ -212,11 +260,14 @@ body {
     position: fixed;
     left: 0;
     top: 0;
+    bottom: 0; /* Full height drawer */
     transform: translateX(-100%);
     width: 85%;
     max-width: 320px;
     background-color: var(--bg-darker);
     border-right: 1px solid var(--border-color);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    z-index: 100; /* Over everything */
   }
 
   .sidebar.open {
@@ -224,7 +275,9 @@ body {
   }
 
   .chat-header {
-    padding-left: 3.5rem; /* Make room for the mobile menu button */
+    padding-left: 3rem; /* Make room for the mobile menu button */
+    padding-right: 1rem;
+    height: 56px; /* slightly smaller header */
   }
 
   .mobile-menu-btn {
@@ -240,7 +293,7 @@ body {
     border: none;
     color: var(--text-main);
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0.5rem; /* Large tap target */
     border-radius: 0.5rem;
   }
 
@@ -268,7 +321,61 @@ body {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.6);
-    z-index: 5;
+    z-index: 90; /* Right below sidebar */
     backdrop-filter: blur(4px);
+  }
+  
+  /* Chat Area Mobile */
+  .chat-messages {
+    padding: 1rem 0.5rem;
+    padding-bottom: 2rem; /* Buffer for bottom input */
+  }
+
+  .message-bubble {
+    max-width: 95%; /* Wider on mobile */
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+  
+  /* Input Container Mobile */
+  .chat-input-container {
+    padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom)); /* iOS safe area */
+    background: var(--bg-darker); /* Solid background on mobile to prevent overlap */
+    border-top: 1px solid var(--border-color);
+  }
+  
+  .input-wrapper {
+    padding: 0.25rem !important; /* Tighter padding */
+    border-radius: 0.75rem !important;
+  }
+  
+  .input-wrapper textarea {
+    padding: 0.75rem !important;
+    font-size: 16px !important; /* Prevent iOS zoom */
+  }
+
+  .model-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.25rem;
+  }
+
+  .tab {
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .message-bubble {
+    max-width: 98%;
+    padding: 0.8rem;
+    font-size: 0.95rem; /* slightly smaller text */
+  }
+  
+  .chat-header {
+    padding-left: 2.75rem;
   }
 }

@@ -93,7 +93,7 @@ export function LoginModal({ isOpen, onClose, onSuccess }: LoginModalProps) {
           <h2 style={{
             fontSize: '1.25rem',
             fontWeight: '600',
-            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #93c5fd 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
@@ -189,19 +189,16 @@ export function LoginModal({ isOpen, onClose, onSuccess }: LoginModalProps) {
 
           <button
             type="submit"
+            className="liquid-btn"
             disabled={isLoading}
             style={{
               width: '100%',
               padding: '0.875rem',
-              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-              border: 'none',
               borderRadius: '0.5rem',
-              color: 'white',
               fontSize: '1rem',
               fontWeight: '600',
               cursor: isLoading ? 'wait' : 'pointer',
               opacity: isLoading ? 0.7 : 1,
-              transition: 'opacity 0.2s'
             }}
           >
             {isLoading ? 'Please wait...' : (isSignUp ? 'Sign Up' : 'Sign In')}

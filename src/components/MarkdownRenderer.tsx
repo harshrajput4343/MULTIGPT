@@ -85,7 +85,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
               <code
                 className={className}
                 style={{
-                  background: 'rgba(99, 102, 241, 0.2)',
+                  background: 'rgba(59, 130, 246, 0.2)',
                   padding: '0.15rem 0.4rem',
                   borderRadius: '0.25rem',
                   fontSize: '0.9em',
@@ -131,7 +131,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
                 marginBottom: '1rem',
                 color: 'var(--text-muted)',
                 fontStyle: 'italic',
-                background: 'rgba(99, 102, 241, 0.1)',
+                background: 'rgba(59, 130, 246, 0.1)',
                 padding: '0.75rem 1rem',
                 borderRadius: '0 0.5rem 0.5rem 0'
               }}>
@@ -158,7 +158,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
             );
           },
           th({ children }) {
-            return <th style={{ background: 'rgba(99, 102, 241, 0.2)', padding: '0.75rem', textAlign: 'left', fontWeight: 600, borderBottom: '2px solid var(--border-color)' }}>{children}</th>;
+            return <th style={{ background: 'rgba(59, 130, 246, 0.2)', padding: '0.75rem', textAlign: 'left', fontWeight: 600, borderBottom: '2px solid var(--border-color)' }}>{children}</th>;
           },
           td({ children }) {
             return <td style={{ padding: '0.75rem', borderBottom: '1px solid var(--border-color)' }}>{children}</td>;

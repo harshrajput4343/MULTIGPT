@@ -9,7 +9,7 @@ export const AVATARS = [
   { id: 5, emoji: '🐼', color: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)' },
   { id: 6, emoji: '🦄', color: 'linear-gradient(135deg, #d946ef 0%, #c026d3 100%)' },
   { id: 7, emoji: '🐸', color: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' },
-  { id: 8, emoji: '🐵', color: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' },
+  { id: 8, emoji: '🐵', color: 'linear-gradient(135deg, #60a5fa 0%, #7c3aed 100%)' },
   { id: 9, emoji: '🦋', color: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' },
   { id: 10, emoji: '🐧', color: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)' },
 ];

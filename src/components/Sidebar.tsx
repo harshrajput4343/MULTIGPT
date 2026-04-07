@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const createNewTag = async () => {
     if (!newTagName.trim()) return;
-    const colors = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+    const colors = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#60a5fa', '#06b6d4'];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     const newTag = await createTag(newTagName.trim(), randomColor);
     if (newTag) {
@@ -98,11 +98,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           fontSize: '1.75rem',
           fontWeight: '800',
           letterSpacing: '-0.03em',
-          background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)',
+          background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
-          textShadow: '0 0 30px rgba(99, 102, 241, 0.3)',
+          textShadow: '0 0 30px rgba(59, 130, 246, 0.3)',
           margin: 0,
           textAlign: 'center'
         }}>
@@ -114,6 +114,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }}>GPT</span>
         </h2>
         <button
+          className="liquid-btn"
           onClick={onNewChat}
           style={{
             display: 'flex',
@@ -121,16 +122,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             justifyContent: 'center',
             gap: '0.5rem',
             padding: '0.75rem',
-            background: 'var(--primary)',
-            color: 'white',
-            border: 'none',
             borderRadius: '0.75rem',
             cursor: 'pointer',
             fontWeight: '600',
-            transition: 'background 0.2s'
           }}
-          onMouseOver={(e) => (e.currentTarget.style.background = 'var(--primary-hover)')}
-          onMouseOut={(e) => (e.currentTarget.style.background = 'var(--primary)')}
         >
           <Plus size={18} /> New Chat
         </button>
@@ -164,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button
             onClick={() => setShowTagFilter(!showTagFilter)}
             style={{
-              background: selectedTagIds.length > 0 ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+              background: selectedTagIds.length > 0 ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
               border: 'none',
               cursor: 'pointer',
               padding: '0.25rem',
@@ -271,8 +266,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 padding: '0.75rem 1rem',
                 borderRadius: '0.5rem',
                 cursor: 'pointer',
-                background: activeChatId === chat.id ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
-                border: activeChatId === chat.id ? '1px solid rgba(99, 102, 241, 0.2)' : '1px solid transparent',
+                background: activeChatId === chat.id ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                border: activeChatId === chat.id ? '1px solid rgba(59, 130, 246, 0.2)' : '1px solid transparent',
                 transition: 'all 0.2s',
                 marginBottom: '0.25rem',
                 position: 'relative'
@@ -299,9 +294,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </button>
                 <div
                   onClick={() => onChatSelect(chat.id)}
-                  style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.875rem' }}
+                  style={{ flex: 1, overflow: 'hidden' }}
                 >
-                  {chat.title}
+                  <div style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.875rem' }}>
+                    {chat.title}
+                  </div>
+                  {chat.updated_at && (
+                    <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                      {new Date(chat.updated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </div>
+                  )}
                 </div>
               </div>
 

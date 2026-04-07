@@ -10,7 +10,7 @@ import { MODELS } from './types';
 import { createChatCompletion } from './lib/openrouter';
 import { getChats, createChat, getMessages, saveMessage, updateChatTitle, shareChat, getSharedChatMessages, getCurrentUser, signOut, onAuthStateChange, saveMemory, getMemories, getUserProfile, updateAvatar } from './lib/supabase';
 import { routeQuery } from './lib/router';
-import { Share2, Check, Copy, ThumbsUp, ThumbsDown, RefreshCw, MoreHorizontal, Mic } from 'lucide-react';
+import { Share2, Check, Copy, ThumbsUp, ThumbsDown, RefreshCw, MoreHorizontal, Mic, Sparkles } from 'lucide-react';
 
 function App() {
   const [activeModelId, setActiveModelId] = useState('auto');
@@ -384,8 +384,8 @@ function App() {
       <div className="chat-messages">
         {routingInfo && (
           <div style={{
-            background: 'rgba(99, 102, 241, 0.1)',
-            border: '1px solid rgba(99, 102, 241, 0.3)',
+            background: 'rgba(59, 130, 246, 0.1)',
+            border: '1px solid rgba(59, 130, 246, 0.3)',
             borderRadius: '0.5rem',
             padding: '0.75rem 1rem',
             marginBottom: '1rem',
@@ -397,9 +397,21 @@ function App() {
           </div>
         )}
         {messages.length === 0 && (
-          <div style={{ textAlign: 'center', marginTop: '10vh', color: 'var(--text-muted)' }}>
-            <h1 style={{ color: 'white', marginBottom: '1rem' }}>How can I help you today?</h1>
-            <p>Select a model or use Auto-Select for the best results.</p>
+          <div style={{ textAlign: 'center', marginTop: '15vh', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{
+              width: 64, height: 64, borderRadius: '1rem', background: '#0f172a',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: '1px solid rgba(255,255,255,0.1)', marginBottom: '1.5rem',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+            }}>
+               <Sparkles size={32} color="#60a5fa" />
+            </div>
+            <h1 style={{ color: 'white', fontSize: '2rem', fontWeight: 600, marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
+              How can I help you today?
+            </h1>
+            <p style={{ fontSize: '1rem', maxWidth: '80%', margin: '0 auto', opacity: 0.8 }}>
+              Select a model from the top to get started.
+            </p>
           </div>
         )}
         {messages.map((msg, index) => (
@@ -489,7 +501,7 @@ function App() {
                     setTimeout(() => setCopiedMsgId(null), 2000);
                   }}
                   style={{
-                    background: copiedMsgId === msg.id + '-share' ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+                    background: copiedMsgId === msg.id + '-share' ? 'rgba(59, 130, 246, 0.2)' : 'transparent',
                     border: 'none',
                     cursor: 'pointer',
                     padding: '0.4rem',
@@ -606,12 +618,10 @@ function App() {
                 <Mic size={20} />
               </button>
               <button
+                className="liquid-btn"
                 onClick={handleSend}
                 disabled={isLoading || !input.trim()}
                 style={{
-                  background: 'var(--primary)',
-                  border: 'none',
-                  color: 'white',
                   padding: '0.6rem 1.2rem',
                   borderRadius: '0.6rem',
                   cursor: 'pointer',
@@ -627,19 +637,25 @@ function App() {
               <button
                 onClick={() => setShowLoginModal(true)}
                 style={{
-                  background: 'var(--primary)',
-                  border: 'none',
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                  border: '1px solid rgba(255,255,255,0.2)',
                   color: 'white',
-                  padding: '0.6rem 1.5rem',
-                  borderRadius: '0.6rem',
+                  padding: '0.8rem 2rem',
+                  borderRadius: '0.75rem',
                   cursor: 'pointer',
                   fontWeight: '600',
-                  fontSize: '1rem',
-                  transition: 'background 0.2s',
-                  boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)'
+                  fontSize: '1.05rem',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 8px 25px rgba(59, 130, 246, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3)',
                 }}
-                onMouseOver={(e) => (e.currentTarget.style.background = 'var(--primary-hover)')}
-                onMouseOut={(e) => (e.currentTarget.style.background = 'var(--primary)')}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 12px 30px rgba(59, 130, 246, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3)';
+                }}
               >
                 Sign In to Start Chatting
               </button>
