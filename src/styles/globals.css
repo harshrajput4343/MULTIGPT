@@ -62,6 +62,7 @@ body {
   position: relative;
   overflow: hidden;
   z-index: 1;
+  pointer-events: auto; /* Ensure clicks are captured */
 }
 
 .liquid-btn::before {
@@ -80,6 +81,7 @@ body {
   transform: skewX(-25deg);
   animation: shine 4s infinite;
   z-index: -1;
+  pointer-events: none; /* Never intercept clicks */
 }
 
 @keyframes shine {
@@ -242,9 +244,19 @@ body {
   opacity: 0;
 }
 
-.fade-enter-active {
-  opacity: 1;
-  transition: opacity 200ms ease-in;
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 /* Mobile Responsiveness */
@@ -347,13 +359,24 @@ body {
   }
   
   .input-wrapper {
-    padding: 0.25rem !important; /* Tighter padding */
-    border-radius: 0.75rem !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 1rem !important;
+    gap: 0.25rem;
   }
   
   .input-wrapper textarea {
-    padding: 0.75rem !important;
+    padding: 0.5rem !important;
     font-size: 16px !important; /* Prevent iOS zoom */
+    height: 44px !important; /* Slightly smaller for mobile */
+  }
+
+  .liquid-btn {
+    min-width: 44px; /* Proper tap target */
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem !important;
   }
 
   .model-tabs {
