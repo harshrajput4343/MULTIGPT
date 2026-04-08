@@ -105,18 +105,21 @@ export function UserMenu({ user, userAvatar, onLogout, onLoginClick, onAvatarCha
             }}
             onClick={() => setIsOpen(false)}
           />
-          <div style={{
-            position: 'absolute',
-            top: 'calc(100% + 0.5rem)',
-            right: 0,
-            width: '280px',
-            background: '#0f172a',
-            border: '1px solid var(--border-color)',
-            borderRadius: '0.75rem',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
-            zIndex: 100,
-            overflow: 'hidden'
-          }}>
+          <div 
+            className="user-menu-dropdown"
+            style={{
+              position: 'absolute',
+              top: 'calc(100% + 0.5rem)',
+              right: 0,
+              width: '280px',
+              background: '#0f172a',
+              border: '1px solid var(--border-color)',
+              borderRadius: '0.75rem',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+              zIndex: 100,
+              overflow: 'hidden'
+            }}
+          >
             {/* User Info */}
             <div style={{
               padding: '1rem',

@@ -582,7 +582,7 @@ function App() {
       </div>
 
       <div className="chat-input-container">
-        <div className="input-wrapper glass" style={{ padding: '0.4rem 0.6rem', borderRadius: '1.25rem', display: 'flex', alignItems: 'flex-end', gap: '0.25rem' }}>
+        <div className="input-wrapper glass" style={{ padding: '0.4rem 0.6rem', borderRadius: '1.25rem', display: 'flex', alignItems: 'flex-end', gap: '0.4rem' }}>
           {user ? (
             <>
               <textarea
@@ -600,11 +600,13 @@ function App() {
                   background: 'transparent',
                   border: 'none',
                   color: 'white',
-                  padding: '0.8rem',
+                  padding: '0.75rem',
                   resize: 'none',
                   outline: 'none',
                   fontSize: '1rem',
-                  height: '50px'
+                  height: '48px',
+                  minHeight: '48px',
+                  maxHeight: '200px'
                 }}
               />
               <button
@@ -630,18 +632,16 @@ function App() {
                 onClick={handleSend}
                 disabled={isLoading || !input.trim()}
                 style={{
-                  padding: 'auto',
+                  width: '42px',
+                  height: '42px',
                   borderRadius: '0.75rem',
                   cursor: 'pointer',
-                  fontWeight: '600',
                   opacity: isLoading || !input.trim() ? 0.5 : 1,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '42px',
-                  height: '42px',
-                  minWidth: '42px',
-                  flexShrink: 0
+                  flexShrink: 0,
+                  marginBottom: '0.2rem'
                 }}
               >
                 {isLoading ? (
