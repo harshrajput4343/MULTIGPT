@@ -333,8 +333,8 @@ body {
     align-items: center;
     justify-content: center;
     position: absolute;
-    top: 0.75rem;
-    left: 0.5rem;
+    top: 6px;
+    left: 8px;
     z-index: 20;
     background: transparent;
     border: none;
