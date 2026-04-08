@@ -76,18 +76,21 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           backdropFilter: 'blur(4px)',
         }}
       />
-      <div style={{
-        position: 'fixed', top: '50%', left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '90%', maxWidth: '440px',
-        background: '#0f172a',
-        border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '1rem',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
-        zIndex: 1001,
-        overflow: 'hidden',
-        animation: 'slideUp 0.25s ease'
-      }}>
+      <div 
+        className="modal-container"
+        style={{
+          position: 'fixed', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '90%', maxWidth: '440px',
+          background: '#0f172a',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '1rem',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+          zIndex: 1001,
+          overflow: 'hidden',
+          animation: 'slideUp 0.25s ease'
+        }}
+      >
         {/* Header */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',

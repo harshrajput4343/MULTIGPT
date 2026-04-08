@@ -74,14 +74,17 @@ export function LoginModal({ isOpen, onClose, onSuccess }: LoginModalProps) {
       zIndex: 1000,
       backdropFilter: 'blur(5px)'
     }}>
-      <div style={{
-        background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
-        borderRadius: '1rem',
-        width: '100%',
-        maxWidth: '420px',
-        border: '1px solid var(--border-color)',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
-      }}>
+      <div 
+        className="modal-container"
+        style={{
+          background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
+          borderRadius: '1rem',
+          width: '100%',
+          maxWidth: '420px',
+          border: '1px solid var(--border-color)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+        }}
+      >
         {/* Header */}
         <div style={{
           padding: '1.25rem',
