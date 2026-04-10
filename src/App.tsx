@@ -412,7 +412,7 @@ function App() {
               border: '1px solid rgba(255,255,255,0.1)', marginBottom: '1.5rem',
               boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
             }}>
-               <Sparkles size={32} color="#60a5fa" />
+              <Sparkles size={32} color="#60a5fa" />
             </div>
             <h1 style={{ color: 'white', fontSize: '2rem', fontWeight: 600, marginBottom: '0.5rem', letterSpacing: '-0.02em' }}>
               How can I help you today?
